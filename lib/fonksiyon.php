@@ -78,7 +78,6 @@ class aracsatis {
                     <div class="col-lg-6 content">
                     <h2>'.$sonucum["baslik"].'</h2>
                     <h3>'.$sonucum["icerik"].'</h3>
-                    <h3>'.$sonucum["icerik"].'</h3>
                     </div>
                 </div>';
 	}

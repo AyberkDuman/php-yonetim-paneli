@@ -48,7 +48,9 @@
                             <li><a href="control.php?sayfa=hakkimizayar"><i class="ti-flag"></i> <span>Hakkımızda Ayarları</span></a></li>
                             <li><a href="control.php?sayfa=filoayar"><i class="ti-car"></i> <span>Araç Filosu</span></a></li>
                             <li><a href="control.php?sayfa=yorumayar"><i class="ti-comment-alt"></i> <span>Müşteri Yorumları</span></a></li> 
-                            
+                            <li><a href="control.php?sayfa=yorumayar"><i class="fa fa-envelope"></i> <span>Gelen Mesajlar</span></a></li>
+                            <li><a href="control.php?sayfa=yorumayar"><i class="fa fa-cog"></i> <span>Mail Ayarları</span></a></li>
+
                         </ul>
                     </nav>
                 </div>
@@ -58,7 +60,7 @@
         <div class="main-content">
             <!-- header area start -->
             <div class="header-area">
-                <div class="row align-items-center">
+                <div class="row align-items-center"  >
                     <!-- nav and search button -->
                     <div class="col-md-6 col-sm-8 clearfix">
                         <div class="nav-btn pull-left">
@@ -69,7 +71,7 @@
                     </div>
                     <!-- profile info & task notification -->
                      <div class="col-sm-6 clearfix">
-                        <div class="user-profile pull-right">
+                        <div class="user-profile pull-right" style="min-height:30px" >
                             <img class="avatar user-thumb" src="assets/images/author/avatar.jpg" alt="avatar">
                             <h4 class="user-name dropdown-toggle" data-toggle="dropdown"> <?php echo $yonetim->kuladial($baglanti); ?> <i class="fa fa-angle-down"></i></h4>
                             <div class="dropdown-menu">
@@ -85,7 +87,7 @@
 
             <div class="main-content-inner">
                <div class="row">
-                    <div class="col-lg-12 mt-5 bg-white text-center" style="min-height:500px;">
+                    <div class="col-lg-12 mt-2 bg-white text-center" style="min-height:500px;">
                         
                         <?php 
 
@@ -105,15 +107,37 @@
                         case "introayar":
                         $yonetim -> introayar($baglanti);
                         break;
-                         case "introresimguncelle":
-                        $yonetim -> introayar($baglanti);
+                        case "introresimguncelle":
+                        $yonetim -> introresimguncelleme($baglanti);
                         break;
-                         case "introresimsil":
-                        $yonetim -> introayar($baglanti);
+                        case "introresimsil":
+                        $yonetim -> introsil($baglanti);
+                        break;
+                        case "introresimekle":
+                        $yonetim -> introresimekleme($baglanti);
+                        break;
+
+                        //ARAÇ FİLO CASE
+                        case "filoayar":
+                        $yonetim -> filoayar($baglanti);
+                        break;
+                        case "filoayarguncelle":
+                        $yonetim -> filoayarguncelleme($baglanti);
+                        break;
+                        case "filoayarsil":
+                        $yonetim -> filoayarsil($baglanti);
+                        break;
+                        case "filoayarekle":
+                        $yonetim -> filoayarekleme($baglanti);
+                        break;
+
+                        //HAKKIMIZDA CASE
+                        case "hakkimizayar":
+                        $yonetim -> hakkimizda($baglanti);
                         break;
 
 
-
+                        
 
                         endswitch;
                         ?>
