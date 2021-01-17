@@ -11,6 +11,8 @@
 
 	class yonetim {
 
+        private $veriler = array();
+
 		function sorgum($vt, $sorgu, $tercih=0) {
 
 			$al = $vt -> prepare($sorgu);
@@ -807,7 +809,6 @@
 
 
         //-----HAKKIMIZDA KISMI FONK------
-
         function hakkimizda($vt) {
 
             echo '<div class="row text-center">
@@ -898,10 +899,403 @@
             endif;
         }
 
+        //-----YORUMLAR KISMI FONK------
+        function yorumayar($vt) {
+
+            echo '<div class="row text-center">
+            <div class="col-lg-12 border-bottom"><h3 class="float-left mt-2 text-info">MÜŞTERİ YORUMLARI</h3><a href="control.php?sayfa=yorumayarekle" class="btn btn-success btn-sm m-2 float-right" >Yeni Yorum Ekle</a></div>';
+            
+            $introbilgiler = self::sorgum($vt, "select * from yorumlar", 2);
+
+            while( $sonbilgi = $introbilgiler -> fetch(PDO::FETCH_ASSOC)):
+
+            echo '<div class="col-lg-4">
+                    <div class="row card-border bg-light p-1 m-1">
+                        <div class="col-lg-9 pt-1 text-left">
+                        <h5> İsim: '.$sonbilgi["isim"].'</h5>
+                        </div>
+
+                        <div class="col-lg-3 text-right p-2">
+                        <a href="control.php?sayfa=yorumayarguncelle&id='.$sonbilgi["id"].'" class="fa fa-edit m-2 text-success" style="font-size:20px;"></a>
+                        <a href="control.php?sayfa=yorumayarsil&id='.$sonbilgi["id"].'" class="fa fa-trash m-2 text-danger" style="font-size:20px;"></a>
+                        </div>
+                        <div class="col-lg-12 border-top text-secondary text-left bg-white" >
+                        '.$sonbilgi["icerik"].'
+                        </div>
+                    </div>
+                  </div>
+            ';
+
+            endwhile;
+
+            echo '</div>';
+        }
+
+        function yorumayarguncelle ($vt) {
+
+            echo '<div class="row text-center"> 
+                  <div class="col-lg-12 border-bottom "><h3 class="mt-3 text-info">YORUM GÜNCELLE</h3>
+                  </div>';
+            
+            $kayitid = $_GET["id"];
+            $kayitbilgial = self::sorgum($vt, "select * from yorumlar where id='$kayitid' ", 1);
+
+            if(!$_POST) :
+                echo '<div class="col-lg-6 mx-auto"> 
+                  <div class="row card-bordered p-1 m-1 bg-light ">
+                  <div class="col-lg-2 pt-3">
+                  Başlık
+                  </div>
+                  
+                  <div class="col-lg-10 p-2">
+                  <form action="" method="post">
+                  <input type="text" name="isim" class="form-control" value="'.$kayitbilgial["isim"].'" >
+                  </div>
+                  
+                  <div class="col-lg-12 border-top p-2">
+                  İçerik
+                  </div>
+                  <div class="col-lg-12 border-top p-2">
+                  <textarea name="mesaj" rows="5" class="form-control">'.$kayitbilgial["icerik"].'</textarea>
+                  </div>
+                  
+                  <div class="col-lg-12 border-top p-2">
+                  <input type="hidden" name="kayitidsi" value="'.$kayitid.'" >
+                  <input type="submit" name="buton" value="Yorum Güncelle" class="btn btn-primary">
+                  </form>
+                  </div>
+                  </div>
+
+                  </div>';
+
+
+                  else :
+
+                    $isim = htmlspecialchars($_POST["isim"]);
+                    $mesaj = htmlspecialchars($_POST["mesaj"]);
+                    $kayitidsi = htmlspecialchars($_POST["kayitidsi"]);
+
+                    if( $isim == "" && $mesaj == "" ):
+                        
+                        echo '<div class="col-lg-6 mx-auto"> 
+                        <div class="alert alert-danger mt-5 ">Veriler Boş Olamaz!</div>
+                        </div>';
+                        header("refresh:2, url=control.php?sayfa=yorumayar");
+
+                    else :
+
+                        self::sorgum($vt, "update yorumlar set icerik='$mesaj', isim='$isim' where id='$kayitidsi'  ", 0);
+                        echo '<div class="col-lg-6 mx-auto"> 
+                        <div class="alert alert-success mt-5 ">Güncelleme Başarılı.</div>
+                        </div>';
+                        header("refresh:2, url=control.php?sayfa=yorumayar");
+
+            endif;
+            endif;
+
+            echo '</div>';
+        }
+
+        function yorumayarsil ($vt) {
+
+            $kayitid = $_GET["id"];
+          
+            echo '<div class="row text-center"> 
+                  <div class="col-lg-12">
+            ';
+
+            self::sorgum($vt, "delete from yorumlar where id='$kayitid' ", 0);
+            echo '<div class="alert alert-success mt-5">Yorum Başarıyla Silindi.</div>';
+            echo '</div></div>';
+            header("refresh:2, url=control.php?sayfa=yorumayar" );
+        }
+
+        function yorumayarekle ($vt) {
+
+            echo '<div class="row text-center"> 
+                  <div class="col-lg-12 border-bottom"><h3 class="mt-3 text-info">YORUM EKLE </h3>
+                  </div>
+            ';
+
+            if(!$_POST):
+
+                echo '<div class="col-lg-6 mx-auto">
+                    <div class="row card-bordered p-1 m-1 bg-light">
+
+                        <div class="col-lg-2 pt-4">
+                        İsim
+                        </div>
+
+                        <div class="col-lg-10 p-2">
+                        <form action="" method="post">
+                        <input type="text" name="isim" class="form-control" />
+                        </div>
+                        
+                        <div class="col-lg-12 border-top p-2">
+                        Mesaj
+                        </div>
+                        <div class="col-lg-12 border-top p-2">
+                        <textarea name="mesaj" rows="5" class="form-control" ></textarea>
+                        </div>
+
+                        <div class="col-lg-12 border-top p-2">
+                        <input type="submit" name="buton" value="Yorum Ekle" class="btn btn-primary" /> 
+                        </form>
+                        </div>
+
+                    </div>';
+                
+                else : 
+                    
+                    $isim=htmlspecialchars($_POST["isim"]);        
+                    $mesaj=htmlspecialchars($_POST["mesaj"]);
+
+                    if( $isim=="" && $mesaj=="" ):
+                        echo '<div class="col-lg-6 mx-auto">
+                        <div class="alert alert-danger mt-5"> Veriler Boş Olamaz!</div>
+                        </div>';
+                        header("refresh:2, url=control.php?sayfa=yorumayar");
+
+                    else :
+                        self::sorgum($vt, "insert into yorumlar (icerik, isim) VALUES('$mesaj', '$isim') ", 0);
+
+                        echo '<div class="col-lg-6 mx-auto">
+                        <div class="alert alert-success mt-5"> Ekleme Başarılı.</div>
+                        </div>';
+                        header("refresh:2, url=control.php?sayfa=yorumayar");
+
+                    endif;
+
+            endif;
+            echo '</div>';
+        }
+        
+        //-----GELEN MESAJLAR KISMI FONK------
+        private function mailgetir ($vt, $veriler){
+
+            $sor = $vt -> prepare("select * from $veriler[0] where durum=$veriler[1] ");
+            $sor -> execute();
+            return $sor;
+
+        }
+
+        function gelenmesaj($vt) {
+            
+            echo '<div class="row">
+                  <div class="col-lg-12 mt-2">
+                  <div class="card">
+                  <div class="card-body">
+                      <ul class="nav nav-tabs" id="myTab" role="tablist" >
+
+                        <li class="nav-item">
+                            <a class="nav-link active" id="gelen-tab" data-toggle="tab" href="#gelen" role="tab" aria-control="gelen" aria-selected="true" ><kbd>'.self::mailgetir($vt, array("gelenmail", 0))->rowCount().'</kbd>Gelen Mesajlar </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link " id="okunmus-tab" data-toggle="tab" href="#okunmus" role="tab" aria-control="okunmus" aria-selected="false" ><kbd>'.self::mailgetir($vt, array("gelenmail", 1))->rowCount().'</kbd>Okunmuş Mesajlar </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link " id="arsiv-tab" data-toggle="tab" href="#arsiv" role="tab" aria-control="arsiv" aria-selected="false" ><kbd>'.self::mailgetir($vt, array("gelenmail", 2))->rowCount().'</kbd>Arşivlenmiş Mesajlar </a>
+                        </li>
+
+                      </ul>
+
+                      <div class="tab-content mt-3" id="benimTab">
+                        <div class="tab-pane fade show active" id="gelen" role="tabpanel" aria-labelledby="gelen-tab">';
+                        
+                            $sonuc = self::mailgetir($vt, array("gelenmail", 0));
+
+                            if( $sonuc ->rowCount()!=0 ):
+
+                                while($sonucson = $sonuc ->fetch(PDO::FETCH_ASSOC)):
+                                    echo '<div class="row">
+                                        <div class="col-lg-12 bg-light mt-2 font-weight-bold" style="border-radius:5px; border:1px solid #eeeeee;">
+
+                                        <div class="row border-bottom">
+                                            <div class="col-lg-1 p-1">İsim</div>
+                                            <div class="col-lg-2 p-1 text-primary">'.$sonucson["ad"].'</div>
+                                            <div class="col-lg-1 p-1">Mail Adresi</div>
+                                            <div class="col-lg-2 p-1 text-primary">'.$sonucson["mailadres"].'</div>
+                                            <div class="col-lg-1 p-1">Konu</div>
+                                            <div class="col-lg-2 p-1 text-primary">'.$sonucson["konu"].'</div>
+                                            <div class="col-lg-1 p-1">Tarih</div>
+                                            <div class="col-lg-1 p-1 text-primary">'.$sonucson["zaman"].'</div>
+                                            <div class="col-lg-1 p-1">
+                                                <a href="control.php?sayfa=mesajoku&id='.$sonucson["id"].'"> <i class="fa fa-folder-open border-right pr-2 text-dark" style="font-size:20px;"></i></a>
+                                                <a href="control.php?sayfa=mesajarsivle&id='.$sonucson["id"].'"> <i class="fa fa-share border-right pr-2 text-dark" style="font-size:20px;"></i></a>
+                                                <a href="control.php?sayfa=mesajsil&id='.$sonucson["id"].'"> <i class="fa fa-close  pr-2 text-dark" style="font-size:20px;"></i></a>
+                                            </div>
+
+                                    </div></div></div>
+                                    ';    
+
+
+
+                                endwhile;
+                            
+                            else :
+                                
+                                echo ' <div class="alert alert-info "> Gelen Mesaj Yok </div> ';
 
 
 
 
+                            endif;
+                        
+                        echo'</div>
+
+                        <div class="tab-pane fade" id="okunmus" role="tabpanel" aria-labelledby="okunmus-tab">';
+                        
+                            $sonuc = self::mailgetir($vt, array("gelenmail", 1));
+
+                            if( $sonuc ->rowCount()!=0 ):
+
+                                while($sonucson = $sonuc ->fetch(PDO::FETCH_ASSOC)):
+                                    echo '<div class="row">
+                                        <div class="col-lg-12 bg-light mt-2 font-weight-bold" style="border-radius:5px; border:1px solid #eeeeee;">
+
+                                        <div class="row border-bottom">
+                                            <div class="col-lg-1 p-1">İsim</div>
+                                            <div class="col-lg-2 p-1 text-primary">'.$sonucson["ad"].'</div>
+                                            <div class="col-lg-1 p-1">Mail Adresi</div>
+                                            <div class="col-lg-2 p-1 text-primary">'.$sonucson["mailadres"].'</div>
+                                            <div class="col-lg-1 p-1">Konu</div>
+                                            <div class="col-lg-2 p-1 text-primary">'.$sonucson["konu"].'</div>
+                                            <div class="col-lg-1 p-1">Tarih</div>
+                                            <div class="col-lg-1 p-1 text-primary">'.$sonucson["zaman"].'</div>
+                                            <div class="col-lg-1 p-1">
+                                                <a href="control.php?sayfa=mesajoku&id='.$sonucson["id"].'"> <i class="fa fa-folder-open border-right pr-2 text-dark" style="font-size:20px;"></i></a>
+                                                <a href="control.php?sayfa=mesajarsivle&id='.$sonucson["id"].'"> <i class="fa fa-share border-right pr-2 text-dark" style="font-size:20px;"></i></a>
+                                                <a href="control.php?sayfa=mesajsil&id='.$sonucson["id"].'"> <i class="fa fa-close  pr-2 text-dark" style="font-size:20px;"></i></a>
+                                            </div>
+
+                                    </div></div></div>
+                                    ';    
+
+
+
+                                endwhile;
+                            
+                            else :
+                                
+                                echo ' <div class="alert alert-info "> Okunmuş Mesaj Yok </div> ';
+
+
+
+
+                            endif;
+                        
+                        echo'</div>
+
+                        <div class="tab-pane fade" id="arsiv" role="tabpanel" aria-labelledby="arsiv-tab">';
+                        
+                            $sonuc = self::mailgetir($vt, array("gelenmail", 2));
+
+                            if( $sonuc ->rowCount()!=0 ):
+
+                                while($sonucson = $sonuc ->fetch(PDO::FETCH_ASSOC)):
+                                    echo '<div class="row">
+                                        <div class="col-lg-12 bg-light mt-2 font-weight-bold" style="border-radius:5px; border:1px solid #eeeeee;">
+
+                                        <div class="row border-bottom">
+                                            <div class="col-lg-1 p-1">İsim</div>
+                                            <div class="col-lg-2 p-1 text-primary">'.$sonucson["ad"].'</div>
+                                            <div class="col-lg-1 p-1">Mail Adresi</div>
+                                            <div class="col-lg-2 p-1 text-primary">'.$sonucson["mailadres"].'</div>
+                                            <div class="col-lg-1 p-1">Konu</div>
+                                            <div class="col-lg-2 p-1 text-primary">'.$sonucson["konu"].'</div>
+                                            <div class="col-lg-1 p-1">Tarih</div>
+                                            <div class="col-lg-1 p-1 text-primary">'.$sonucson["zaman"].'</div>
+                                            <div class="col-lg-1 p-1">
+                                                <a href="control.php?sayfa=mesajoku&id='.$sonucson["id"].'"> <i class="fa fa-folder-open border-right pr-2 text-dark" style="font-size:20px;"></i></a>
+                                                <a href="control.php?sayfa=mesajarsivle&id='.$sonucson["id"].'"> <i class="fa fa-share border-right pr-2 text-dark" style="font-size:20px;"></i></a>
+                                                <a href="control.php?sayfa=mesajsil&id='.$sonucson["id"].'"> <i class="fa fa-close  pr-2 text-dark" style="font-size:20px;"></i></a>
+                                            </div>
+
+                                    </div></div></div>
+                                    ';    
+
+
+
+                                endwhile;
+                            
+                            else :
+                                
+                                echo ' <div class="alert alert-info "> Arşivlenmiş Mesaj Yok </div> ';
+
+
+
+
+                            endif;
+                        
+                        echo'</div>
+
+                      </div>
+                  </div>
+                  </div>
+                  </div>
+                  </div>
+
+            ';    
+        }
+
+        function mesajdetay($vt, $id) {
+
+            $mesajbilgi = self::sorgum($vt, "select * from gelenmail where id=$id ", 1);
+
+            echo '<div class="row m-2">
+                                        <div class="col-lg-12 bg-light mt-2 font-weight-bold" style="border-radius:5px; border:1px solid #eeeeee;">
+
+                                        <div class="row border-bottom">
+                                            <div class="col-lg-1 p-1">İsim</div>
+                                            <div class="col-lg-2 p-1 text-primary">'.$mesajbilgi["ad"].'</div>
+                                            <div class="col-lg-1 p-1">Mail Adresi</div>
+                                            <div class="col-lg-2 p-1 text-primary">'.$mesajbilgi["mailadres"].'</div>
+                                            <div class="col-lg-1 p-1">Konu</div>
+                                            <div class="col-lg-2 p-1 text-primary">'.$mesajbilgi["konu"].'</div>
+                                            <div class="col-lg-1 p-1">Tarih</div>
+                                            <div class="col-lg-1 p-1 text-primary">'.$mesajbilgi["zaman"].'</div>
+                                            <div class="col-lg-1 p-1">
+                                    
+                                                <a href="control.php?sayfa=mesajarsivle&id='.$mesajbilgi["id"].'"> <i class="fa fa-share border-right pr-2 text-dark" style="font-size:20px;"></i></a>
+                                                <a href="control.php?sayfa=mesajsil&id='.$mesajbilgi["id"].'"> <i class="fa fa-close  pr-2 text-dark" style="font-size:20px;"></i></a>
+                                            </div>
+                                            </div>
+
+                                            <div class="row text-left p-2">
+                                                <div class="col-lg-12">
+                                                '.$mesajbilgi["mesaj"].'
+                                                </div>
+                                            </div>
+
+                                    </div></div></div>
+                                    ';    
+
+            self::sorgum($vt, "update gelenmail set durum=1 where id=$id ", 0);   
+        }
+
+        function mesajarsivle($vt, $id) {
+
+            echo '<div class="row m-2">
+                <div class="col-lg-12 mt-2 " style="border-radius:5px; border:1px solid #eeeeee;">
+                    <div class="alert alert-info mt-2 mb-2">Mesaj Arşivlendi.</div>
+                </div>    
+            </div>';    
+            header("refresh:2, url=control.php?sayfa=gelenmesaj");
+            self::sorgum($vt, "update gelenmail set durum=2 where id=$id ", 0);  
+        }
+
+        function mesajsil($vt, $id) {
+
+            echo '<div class="row m-2">
+                <div class="col-lg-12 mt-2 " style="border-radius:5px; border:1px solid #eeeeee;">
+                    <div class="alert alert-info mt-2 mb-2">Mesaj Silindi.</div>
+                </div>    
+            </div>';    
+            header("refresh:2, url=control.php?sayfa=gelenmesaj");
+            self::sorgum($vt, "delete from gelenmail where id=$id ", 0);  
+        }
 
 	}
 

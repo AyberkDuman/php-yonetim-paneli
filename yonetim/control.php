@@ -48,8 +48,7 @@
                             <li><a href="control.php?sayfa=hakkimizayar"><i class="ti-flag"></i> <span>Hakkımızda Ayarları</span></a></li>
                             <li><a href="control.php?sayfa=filoayar"><i class="ti-car"></i> <span>Araç Filosu</span></a></li>
                             <li><a href="control.php?sayfa=yorumayar"><i class="ti-comment-alt"></i> <span>Müşteri Yorumları</span></a></li> 
-                            <li><a href="control.php?sayfa=yorumayar"><i class="fa fa-envelope"></i> <span>Gelen Mesajlar</span></a></li>
-                            <li><a href="control.php?sayfa=yorumayar"><i class="fa fa-cog"></i> <span>Mail Ayarları</span></a></li>
+                            <li><a href="control.php?sayfa=gelenmesaj"><i class="fa fa-envelope"></i> <span>Gelen Mesajlar</span></a></li>
 
                         </ul>
                     </nav>
@@ -135,8 +134,35 @@
                         case "hakkimizayar":
                         $yonetim -> hakkimizda($baglanti);
                         break;
+                        
+                        //YORUMLAR CASE 
+                        case "yorumayar":
+                        $yonetim -> yorumayar($baglanti);
+                        break;
+                        case "yorumayarguncelle":
+                        $yonetim -> yorumayarguncelle($baglanti);
+                        break;
+                        case "yorumayarsil":
+                        $yonetim -> yorumayarsil($baglanti);
+                        break;
+                        case "yorumayarekle":
+                        $yonetim -> yorumayarekle($baglanti);
+                        break;
 
-
+                        //GELEN MESAJ CASE
+                        case "gelenmesaj":
+                        $yonetim -> gelenmesaj($baglanti);
+                        break;
+                        case "mesajoku":
+                        $yonetim -> mesajdetay($baglanti, $_GET["id"]);
+                        break;
+                        case "mesajarsivle":
+                        $yonetim -> mesajarsivle($baglanti, $_GET["id"]);
+                        break;
+                        case "mesajsil":
+                        $yonetim -> mesajsil($baglanti, $_GET["id"]);
+                        break;
+                        
                         
 
                         endswitch;
